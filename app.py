@@ -2,7 +2,8 @@ from flask import Flask, request
 from flask_cors import CORS
 from json import dumps, loads
 from bson.objectid import ObjectId
-from db_connect import find_user, add_user, get_team_users, get_team_projects, get_project_details, add_new_project
+from db_connect import find_user, add_user, get_team_users, get_team_projects, get_project_details, add_new_project, \
+    mission_accomplished
 from login_token import certify_token, generate_token
 
 app = Flask(__name__)
@@ -70,6 +71,19 @@ def add_project():
             return dumps({'success': True, 'project_name': data['project_name']})
         else:
             return dumps({'success': False, 'reason': '新建项目失败'})
+
+
+@app.route('/item_accomplished', methods=['GET'])
+def item_accomplished():
+    if not certify_token(token=request.headers.get('token'), key=request.headers.get('username')):
+        return dumps({'success': False, 'reason': '您的token已失效'})
+    else:
+        response = mission_accomplished(request.args.get('id'))
+        print(response)
+        response['success'] = True
+        response['_id'] = str(response['_id'])
+        response['deadline'] = response['deadline'].strftime('%Y-%m-%d')
+        return dumps(response)
 
 
 def valid_login(options):

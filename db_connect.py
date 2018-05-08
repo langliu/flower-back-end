@@ -1,5 +1,5 @@
 from json import dumps
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 from bson.objectid import ObjectId
 
 mongodb_client = MongoClient('localhost', 27017)
@@ -116,4 +116,14 @@ def add_new_project(options, data):
         return False
 
 
-print(get_project_details({'_id': ObjectId('5ae7e3f9e2c04342d42c2016')}))
+def mission_accomplished(item_id):
+    """
+    改变项目状态
+    :param item_id: str(项目id)
+    :return: dict(修改后的项目数据)
+    """
+    status = project_item.find_one({'_id': ObjectId(item_id)})['status']  # item当前状态
+    return project_item.find_one_and_update(
+        {'_id': ObjectId(item_id)},
+        {'$set': {'status': not status}},
+        return_document=ReturnDocument.AFTER)
