@@ -127,3 +127,17 @@ def mission_accomplished(item_id):
         {'_id': ObjectId(item_id)},
         {'$set': {'status': not status}},
         return_document=ReturnDocument.AFTER)
+
+
+def get_project_item_detail(project_item_id):
+    """
+    获取任务详情
+    :param project_item_id: str(任务id)
+    :return: dict(查询结果)
+    """
+    response = project_item.find_one({'_id': ObjectId(project_item_id)})
+    print(response)
+    if response:
+        response['_id'] = str(response['_id'])
+        response['deadline'] = response['deadline'].strftime('%Y-%m-%d')
+    return response
